@@ -1,0 +1,105 @@
+//Очистка потока
+@mixin clearfix {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+//Расположение бэкграунда
+@mixin bgpos {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+//Позиционирование фона с наложением на картинку
+@mixin coverpos {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+}
+
+//Вертикальное выравнивание
+@mixin verAl {
+  position: relative;
+  top: 50%;
+  display: block;
+  transform: translateY(-50%);
+}
+
+//Горизонтальные линии у заголовка
+@mixin title ($w, $h, $c) {
+  overflow: hidden;
+
+  span {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  &:before,
+  &:after {
+    content: '';
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: $w;
+    height: $h;
+    background-color: $c;
+  }
+
+  &:before {
+    left: -0.2%;
+    margin-left: -100%;
+  }
+
+  &:after {
+    right: -0.2%;
+    margin-right: -100%;
+  }
+}
+
+//Кнопка-гамбургер для меню
+@mixin gamburger ($w, $h, $c, $colorbg) {
+  z-index: 10000;
+  padding: 0.3rem;
+  border: none;
+  border-radius: 0.2rem;
+  -webkit-border-radius: 0.2rem;
+  -moz-border-radius: 0.2rem;
+  -ms-border-radius: 0.2rem;
+  -o-border-radius: 0.2rem;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    background: $colorbg;
+  }
+
+  &__line {
+    display: block;
+    width: $w;
+    height: $h;
+    margin-bottom: 7px;
+    border-radius: 1px;
+    background: $c;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+//---------------------------------------------
+
+
+//---------------------------------------------
+//		Функции
+//---------------------------------------------
+
+//Перевод пикселей в ремы
+@function rem($pxsize) {
+  @return ($pxsize/16px)+rem;
+}

@@ -1,20 +1,13 @@
-@font-face {
-    font-family: "RobotoRegular s";
-    src: url("../fonts/RobotoRegular/RobotoRegular.eot");
-    src: url("../fonts/RobotoRegular/RobotoRegular.eot?#iefix") format("embedded-opentype"),
-        url("../fonts/RobotoRegular/RobotoRegular.woff") format("woff"),
-        url("../src/fonts/RobotoRegular/RobotoRegular.ttf") format("truetype");
-    font-style: normal;
-    font-weight: normal;
+@mixin font-face($font-family, $file-path) {
+    @font-face {
+        font-family: $font-family;
+        font-weight: normal;
+        font-style: normal;
+        src: url('#{$file-path}.eot');
+        src: url('#{$file-path}.eot?#iefix') format('embedded-opentype'),
+        url('#{$file-path}.woff') format('woff'),
+        url('#{$file-path}.ttf') format('truetype');
+    }
 }
 
-@font-face {
-    font-family: "MyriadPro";
-    src: url("../fonts/MyriadPro/MyriadPro-Regular.eot");
-    src: url("../fonts/MyriadPro/MyriadPro-Regular.eot?#iefix") format("embedded-opentype"),
-        url("../fonts/MyriadPro/MyriadPro-Regular.woff") format("woff"),
-        url("../fonts/MyriadPro-Regular.ttf") format("truetype");
-    font-style: normal;
-    font-weight: normal;
-}
-
+@include font-face("RobotoBold", "../fonts/RobotoBold/RobotoBold");

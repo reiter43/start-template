@@ -19,21 +19,24 @@ const sass = require('gulp-sass');
 
 const imagemin = require('gulp-imagemin');
 
-
+const gcmq = require('gulp-group-css-media-queries');
 
 
 
 //Таск для обработки стилей
 gulp.task('styles', () => {
 	return gulp.src([
-		'./src/libs/**/*.scss',
+		// './src/libs/owlcarousel/*.css',
+		// './src/libs/bootstrap/*.scss',
+		// './src/libs/fontawesome/*.css',
 		'./src/scss/style.scss'
 	])
 		.pipe(sourcemaps.init())				
 		.pipe(sass())
 		.pipe(concat('style.css'))
+		.pipe(gcmq())
 		.pipe(autoprefixer({
-			browsers: ['last 2 versions'],
+			browsers: ['> 0.1%'],
 			cascade: false
 		}))
 		.pipe(cleanCSS({
@@ -48,7 +51,8 @@ gulp.task('styles', () => {
 //Таск для обработки скриптов
 gulp.task('scripts', () => {
 	return gulp.src([
-		'./src/libs/**/*.js',
+		// './src/libs/jQuery/*.js',
+		// './src/libs/owlcarousel/*.js',
 		'./src/js/**/*.js'
 	])
 		.pipe(concat('script.js'))

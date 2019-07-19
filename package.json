@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "del": "^3.0.0"
+    "del": "^5.0.0"
   },
   "devDependencies": {
     "browser-sync": "^2.26.3",
@@ -12,6 +12,7 @@
     "gulp-autoprefixer": "^6.0.0",
     "gulp-clean-css": "^4.0.0",
     "gulp-concat": "^2.6.1",
+    "gulp-group-css-media-queries": "^1.2.2",
     "gulp-imagemin": "^5.0.3",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",

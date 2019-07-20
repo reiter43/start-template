@@ -100,25 +100,32 @@ gulp.task('watch', () => {
 	gulp.watch("./build/*.html").on('change', browserSync.reload);
 });
 
-
+//Таск для генерации сетки
 gulp.task('grid', (done) => {
-
 	let settings = {
-		outputStyle: "scss",	    
+		filename: "smart-grid",
+		outputStyle: "scss",
+		columns: 12,
+		offset: "30px",
+		mobileFirst: false,
+		container: {
+			maxWidth: "1024px",
+			fields: "20px"
+		},    
     	breakPoints: {
-    		md: {
-	            width: "920px",
-	            fields: "15px"
-	        },
-	        sm: {
-	            width: "720px"
-	        },
-	        xs: {
-	            width: "576px"
-	        },
-	        xxs: {
-	            width: "420px"
-	        },
+    		lg: {
+				width: "1200px"
+			},
+			md: {
+				width: "992px",
+				fields: "15px"
+			},
+			sm: {
+				width: "720px"
+			},
+			xs: {
+				width: "576px"
+			},
 	        xxxs: {
 	            width: "320px"
 	        }

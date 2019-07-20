@@ -21,6 +21,8 @@ const imagemin = require('gulp-imagemin');
 
 const gcmq = require('gulp-group-css-media-queries');
 
+const smartgrid = require('smart-grid');
+
 
 
 //Таск для обработки стилей
@@ -98,5 +100,38 @@ gulp.task('watch', () => {
 	gulp.watch("./build/*.html").on('change', browserSync.reload);
 });
 
+
+gulp.task('grid', (done) => {
+
+	let settings = {
+		outputStyle: "scss",	    
+    	breakPoints: {
+    		md: {
+	            width: "920px",
+	            fields: "15px"
+	        },
+	        sm: {
+	            width: "720px"
+	        },
+	        xs: {
+	            width: "576px"
+	        },
+	        xxs: {
+	            width: "420px"
+	        },
+	        xxxs: {
+	            width: "320px"
+	        }
+    	}
+	};
+
+	smartgrid('./src/scss', settings);
+	done();
+});
+
+
+
 //Таск по умолчанию, Запускает del, styles, scripts и watch
 gulp.task('default', gulp.series('del', gulp.parallel('styles', 'scripts', 'img-compress'), 'watch'));
+
+

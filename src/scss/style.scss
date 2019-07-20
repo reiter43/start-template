@@ -2,6 +2,7 @@
 @import 'fonts.scss';
 @import 'normalize.scss';
 @import 'mixsins.scss';
+@import 'smart-grid.scss';
 
 
 
@@ -13,10 +14,8 @@
     @include clearfix;
 }
 
-.container {
-    max-width: 1024px;
-    margin: 0 auto;
-    padding: 0 rem(32px);
+.wrapper{
+    @include wrapper;
 }
 
 html {

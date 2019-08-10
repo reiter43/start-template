@@ -23,14 +23,15 @@ const gcmq = require('gulp-group-css-media-queries');
 
 const smartgrid = require('smart-grid');
 
+const babel = require('gulp-babel');
+
 
 
 //Таск для обработки стилей
 gulp.task('styles', () => {
 	return gulp.src([
-		// './src/libs/owlcarousel/*.css',
-		// './src/libs/bootstrap/*.scss',
-		// './src/libs/fontawesome/*.css',
+		'./src/libs/owlcarousel/*.css',		
+		'./src/libs/magneficPopap/*.css',		
 		'./src/scss/style.scss'
 	])
 		.pipe(sourcemaps.init())				
@@ -50,17 +51,33 @@ gulp.task('styles', () => {
 });
 
 
-//Таск для обработки скриптов
+//Таск для обработки скриптов jQUery
 gulp.task('scripts', () => {
 	return gulp.src([
-		// './src/libs/jQuery/*.js',
-		// './src/libs/owlcarousel/*.js',
-		'./src/js/**/*.js'
+		'./src/libs/jQuery/*.js',
+		'./src/libs/owlcarousel/*.js',
+		'./src/libs/pageToScroll/*.js',
+		'./src/libs/magneficPopap/*.js',
+		'./src/libs/spincrement/*.js',
+		'./src/js/scriptJquery/*.js'
 	])
-		.pipe(concat('script.js'))
-		.pipe(uglify({
-			toplevel: true
+		.pipe(concat('all.js'))
+		.pipe(uglify())
+		.pipe(gulp.dest('./build/js'))
+		.pipe(browserSync.stream());
+});
+
+//Таск для обработки скриптов кастомных
+gulp.task('scriptsCustom', () => {
+	return gulp.src([		
+		'./src/js/script/*.js',
+		'./src/js/script/script.js'
+	])
+		.pipe(babel({
+			presets: ['@babel/env']
 		}))
+		.pipe(concat('scripts.js'))
+		.pipe(uglify())
 		.pipe(gulp.dest('./build/js'))
 		.pipe(browserSync.stream());
 });
@@ -95,7 +112,8 @@ gulp.task('watch', () => {
 	//Следить за файлами со стилями с нужным расширением
 	gulp.watch('./src/scss/**/*.scss', gulp.series('styles'))
 	//Следить за JS файлами
-	gulp.watch('./src/js/**/*.js', gulp.series('scripts'))
+	gulp.watch('./src/js/**/*.js', gulp.series('scripts', gulp.parallel( 'scriptsCustom') ))
+	// gulp.watch('./src/js/script/*.js', gulp.series('scriptsCustom', ))
 	//При изменении HTML запустить синхронизацию
 	gulp.watch("./build/*.html").on('change', browserSync.reload);
 });
@@ -109,8 +127,8 @@ gulp.task('grid', (done) => {
 		offset: "30px",
 		mobileFirst: false,
 		container: {
-			maxWidth: "1024px",
-			fields: "20px"
+			maxWidth: "1250px",
+			fields: "40px"
 		},    
     	breakPoints: {
     		lg: {
@@ -138,7 +156,7 @@ gulp.task('grid', (done) => {
 
 
 
-//Таск по умолчанию, Запускает del, styles, scripts и watch
-gulp.task('default', gulp.series('del', gulp.parallel('styles', 'scripts', 'img-compress'), 'watch'));
+//Таск по умолчанию. Запускает del, styles, scripts и watch
+gulp.task('default', gulp.series('del', gulp.parallel('styles', 'scripts', 'scriptsCustom','img-compress'), 'watch'));
 
 

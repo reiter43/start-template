@@ -1,8 +1,7 @@
-
 @import 'fonts.scss';
-@import 'normalize.scss';
+@import './src/libs/normalize.scss';
 @import 'mixsins.scss';
-@import 'smart-grid.scss';
+@import '../libs/smart-grid.scss';
 
 
 

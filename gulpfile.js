@@ -32,8 +32,8 @@ const svgSprite = require("gulp-svg-sprite");
 gulp.task('styles', () => {
 	return gulp.src([
 		'./src/libs/owlcarousel/*.css',
-		'./src/libs/slick/*.css',
-		'./src/libs/magneficPopap/*.css',		
+		// './src/libs/slick/*.css',
+		'./src/libs/magneficPopap/*.css',
 		'./src/scss/style.scss'
 	])
 		.pipe(sourcemaps.init())
@@ -42,7 +42,7 @@ gulp.task('styles', () => {
 		.pipe(gcmq())
 		.pipe(autoprefixer({
 			grid: true,
-			overrideBrowserslist: ['last 10 versions'],
+			overrideBrowserslist: ['last 3 versions'],
 			cascade: false
 		}))
 		.pipe(cleanCSS({
@@ -59,10 +59,10 @@ gulp.task('scripts', () => {
 	return gulp.src([
 		'./src/libs/jQuery/*.js',
 		'./src/libs/owlcarousel/*.js',
-		'./src/libs/slick/*.js',
+		// './src/libs/slick/*.js',
 		// './src/libs/pageToScroll/*.js',
-		'./src/libs/magneficPopap/*.js',
-		// './src/libs/spincrement/*.js',
+		'./src/libs/lazyLoad/*js',
+		'./src/libs/magneficPopap/*.js',				
 		'./src/js/scriptJquery/*.js'
 	])
 		.pipe(concat('all.js'))
@@ -81,7 +81,7 @@ gulp.task('scriptsCustom', () => {
 			presets: ['@babel/env']
 		}))
 		.pipe(concat('scripts.js'))
-		.pipe(uglify())
+		// .pipe(uglify())
 		.pipe(gulp.dest('./build/js'))
 		.pipe(browserSync.stream());
 });
@@ -153,14 +153,22 @@ gulp.task('grid', (done) => {
 		offset: "30px",
 		mobileFirst: false,
 		container: {
-			maxWidth: "1000px",
-			fields: "100px"
+			maxWidth: "1920px",
+			fields: "181px"
 		},
 		breakPoints: {
-			// lg: {
-			// 	width: "1200px",
-			// 	fields: "50px"
-			// },
+			lllg: {
+				width: "1700px",
+				fields: "100px"
+			},
+			llg: {
+				width: "1450px",
+				fields: "50px"
+			},
+			lg: {
+				width: "1200px",
+				fields: "50px"
+			},
 			md: {
 				width: "996px",
 				fields: "50px"
@@ -174,7 +182,7 @@ gulp.task('grid', (done) => {
 				fields: "15px"
 			},
 			xxs: {
-				width: "505px",
+				width: "375px",
 				fields: "15px"
 			},
 			xxxs: {
@@ -183,9 +191,10 @@ gulp.task('grid', (done) => {
 		}
 	};
 
-	smartgrid('./src/scss', settings);
+	smartgrid('./src/libs', settings);
 	done();
 });
+
 
 
 
@@ -213,7 +222,7 @@ gulp.task('watch', () => {
 
 
 
-//Таск по умолчанию. Запускает del, styles, scripts и watch
+//Таск по умолчанию. Запускает сборку
 gulp.task('default', gulp.series('del', 'grid', gulp.parallel('styles', 'scripts', 'scriptsCustom', 'img-compress', 'svg'), 'watch'));
 
 

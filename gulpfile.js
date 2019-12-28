@@ -2,6 +2,8 @@
 const gulp = require('gulp');
 
 const del = require('del');
+const clone = require('gulp-clone');
+const cloneSink = clone.sink();
 
 const browserSync = require('browser-sync').create();
 
@@ -19,6 +21,8 @@ const babel = require('gulp-babel');
 const imagemin = require('gulp-imagemin');
 const imgCompress = require('imagemin-jpeg-recompress');
 const imageminPngquant = require('imagemin-pngquant');
+const webp = require('gulp-webp');
+const cache = require('gulp-cache');
 
 const svgmin = require("gulp-svgmin");
 const cheerio = require("gulp-cheerio");
@@ -27,15 +31,84 @@ const svgSprite = require("gulp-svg-sprite");
 
 
 
+let varStyles = [
+	// './src/libs/owlcarousel/*.css',
+	// './src/libs/slick/*.css',
+	// './src/libs/magneficPopap/*.css',
+	'./src/scss/style.scss'
+];
+
+let varScriptsJ = [
+	// './src/libs/jQuery/*.js',
+	// './src/libs/owlcarousel/*.js',
+	// './src/libs/slick/*.js',
+	// './src/libs/pageToScroll/*.js',
+	// './src/libs/lazyLoad/*js',
+	// './src/libs/magneficPopap/*.js',
+	// './src/js/scriptJquery/*.js'
+];
+
+let varScripts = [
+	'./src/js/script/*.js',
+	'./src/js/script/script.js'
+];
+
+let varDel = [
+	'build/css/*',
+	'build/js/*',
+	'build/img/*'
+];
+
+let settings = {
+	filename: "smart-grid",
+	outputStyle: "scss",
+	columns: 12,
+	offset: "30px",
+	mobileFirst: false,
+	container: {
+		maxWidth: "1920px",
+		fields: "181px"
+	},
+	breakPoints: {
+		lllg: {
+			width: "1700px",
+			fields: "100px"
+		},
+		llg: {
+			width: "1450px",
+			fields: "50px"
+		},
+		lg: {
+			width: "1200px",
+			fields: "50px"
+		},
+		md: {
+			width: "996px",
+			fields: "50px"
+		},
+		sm: {
+			width: "750px",
+			fields: "30px"
+		},
+		xs: {
+			width: "576px",
+			fields: "15px"
+		},
+		xxs: {
+			width: "375px",
+			fields: "15px"
+		},
+		xxxs: {
+			width: "320px"
+		}
+	}
+};
+
+
 
 //Таск для обработки стилей
 gulp.task('styles', () => {
-	return gulp.src([
-		'./src/libs/owlcarousel/*.css',
-		// './src/libs/slick/*.css',
-		'./src/libs/magneficPopap/*.css',
-		'./src/scss/style.scss'
-	])
+	return gulp.src(varStyles)
 		.pipe(sourcemaps.init())
 		.pipe(sass())
 		.pipe(concat('style.css'))
@@ -56,15 +129,7 @@ gulp.task('styles', () => {
 
 //Таск для обработки скриптов jQUery
 gulp.task('scripts', () => {
-	return gulp.src([
-		'./src/libs/jQuery/*.js',
-		'./src/libs/owlcarousel/*.js',
-		// './src/libs/slick/*.js',
-		// './src/libs/pageToScroll/*.js',
-		'./src/libs/lazyLoad/*js',
-		'./src/libs/magneficPopap/*.js',				
-		'./src/js/scriptJquery/*.js'
-	])
+	return gulp.src(varScriptsJ)
 		.pipe(concat('all.js'))
 		.pipe(uglify())
 		.pipe(gulp.dest('./build/js'))
@@ -73,32 +138,25 @@ gulp.task('scripts', () => {
 
 //Таск для обработки скриптов кастомных
 gulp.task('scriptsCustom', () => {
-	return gulp.src([
-		'./src/js/script/*.js',
-		'./src/js/script/script.js'
-	])
+	return gulp.src(varScripts)
 		.pipe(babel({
 			presets: ['@babel/env']
 		}))
 		.pipe(concat('scripts.js'))
-		// .pipe(uglify())
+		.pipe(uglify())
 		.pipe(gulp.dest('./build/js'))
 		.pipe(browserSync.stream());
 });
 
 //Таск для очистки папки build
 gulp.task('del', () => {
-	return del([
-		'build/css/*',
-		'build/js/*',
-		'build/img/*'
-	])
+	return del(varDel)
 });
 
-// Таск для сжатия изображений
+// Таск для сжатия изображений и конвертации в WebP
 gulp.task('img-compress', () => {
 	return gulp.src('./src/img/images/**')
-		.pipe(imagemin([
+		.pipe(cache(imagemin([
 			imgCompress({
 				loops: 4,
 				min: 65,
@@ -108,11 +166,14 @@ gulp.task('img-compress', () => {
 			imagemin.gifsicle({ interlaced: true }),
 			imagemin.jpegtran({ progressive: true }),
 			imagemin.optipng({ optimizationLevel: 3 }),
-			imageminPngquant(	{
-				quality:[0.7, 0.9],
-				speed: 1			
-			})		
-		]))
+			imageminPngquant({
+				quality: [0.7, 0.9],
+				speed: 1
+			})
+		])))
+		.pipe(cloneSink)
+		.pipe(webp())
+		.pipe(cloneSink.tap())
 		.pipe(gulp.dest('./build/img/images'))
 });
 
@@ -146,55 +207,10 @@ gulp.task('svg', () => {
 
 //Таск для генерации сетки
 gulp.task('grid', (done) => {
-	let settings = {
-		filename: "smart-grid",
-		outputStyle: "scss",
-		columns: 12,
-		offset: "30px",
-		mobileFirst: false,
-		container: {
-			maxWidth: "1920px",
-			fields: "181px"
-		},
-		breakPoints: {
-			lllg: {
-				width: "1700px",
-				fields: "100px"
-			},
-			llg: {
-				width: "1450px",
-				fields: "50px"
-			},
-			lg: {
-				width: "1200px",
-				fields: "50px"
-			},
-			md: {
-				width: "996px",
-				fields: "50px"
-			},
-			sm: {
-				width: "750px",
-				fields: "30px"
-			},
-			xs: {
-				width: "576px",
-				fields: "15px"
-			},
-			xxs: {
-				width: "375px",
-				fields: "15px"
-			},
-			xxxs: {
-				width: "320px"
-			}
-		}
-	};
-
+	settings;
 	smartgrid('./src/libs', settings);
 	done();
 });
-
 
 
 
@@ -220,9 +236,7 @@ gulp.task('watch', () => {
 
 
 
-
-
 //Таск по умолчанию. Запускает сборку
-gulp.task('default', gulp.series('del', 'grid', gulp.parallel('styles', 'scripts', 'scriptsCustom', 'img-compress', 'svg'), 'watch'));
+gulp.task('default', gulp.series('del', gulp.parallel('styles', 'scripts', 'scriptsCustom', 'img-compress', 'svg'), 'watch'));
 
 

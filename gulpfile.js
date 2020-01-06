@@ -2,8 +2,6 @@
 const gulp = require('gulp');
 
 const del = require('del');
-const clone = require('gulp-clone');
-const cloneSink = clone.sink();
 
 const browserSync = require('browser-sync').create();
 
@@ -45,7 +43,7 @@ let varScriptsJ = [
 	// './src/libs/pageToScroll/*.js',
 	// './src/libs/lazyLoad/*js',
 	// './src/libs/magneficPopap/*.js',
-	// './src/js/scriptJquery/*.js'
+	'./src/js/scriptJquery/*.js'
 ];
 
 let varScripts = [
@@ -171,10 +169,13 @@ gulp.task('img-compress', () => {
 				speed: 1
 			})
 		])))
-		.pipe(cloneSink)
-		.pipe(webp())
-		.pipe(cloneSink.tap())
 		.pipe(gulp.dest('./build/img/images'))
+});
+
+gulp.task('webp', () => {
+    return gulp.src('./src/img/images/**')
+        .pipe(webp())
+        .pipe(gulp.dest('./build/img/images'))
 });
 
 // Таск для создания SVG-спрайтов
@@ -222,7 +223,7 @@ gulp.task('watch', () => {
 		}
 	});
 	// Слежка за добавлением изображений
-	gulp.watch('./src/img/images/**', gulp.series('img-compress'))
+	gulp.watch('./src/img/images/**', gulp.series('img-compress', gulp.parallel('webp')))
 	// Слежка за добавлением svg
 	gulp.watch('./src/img/svg/*.svg', gulp.series('svg'))
 	//Следить за файлами со стилями с нужным расширением
@@ -237,6 +238,6 @@ gulp.task('watch', () => {
 
 
 //Таск по умолчанию. Запускает сборку
-gulp.task('default', gulp.series('del', gulp.parallel('styles', 'scripts', 'scriptsCustom', 'img-compress', 'svg'), 'watch'));
+gulp.task('default', gulp.series('del', gulp.parallel('styles', 'scripts', 'scriptsCustom', 'img-compress', 'webp', 'svg'), 'watch'));
 
 

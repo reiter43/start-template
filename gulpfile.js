@@ -2,6 +2,7 @@
 const gulp = require('gulp');
 
 const del = require('del');
+const rename = require("gulp-rename");
 
 const browserSync = require('browser-sync').create();
 
@@ -20,7 +21,9 @@ const imagemin = require('gulp-imagemin');
 const imgCompress = require('imagemin-jpeg-recompress');
 const imageminPngquant = require('imagemin-pngquant');
 const webp = require('gulp-webp');
+const imageminWebp = require("imagemin-webp");
 const cache = require('gulp-cache');
+const imageResize = require('gulp-image-resize');
 
 const svgmin = require("gulp-svgmin");
 const cheerio = require("gulp-cheerio");
@@ -152,8 +155,8 @@ gulp.task('del', () => {
 });
 
 // Таск для сжатия изображений и конвертации в WebP
-gulp.task('img-compress', () => {
-	return gulp.src('./src/img/images/**')
+gulp.task('img-compress1', () => {
+	return gulp.src('./src/img/images/**/*.*')		
 		.pipe(cache(imagemin([
 			imgCompress({
 				loops: 4,
@@ -168,15 +171,54 @@ gulp.task('img-compress', () => {
 				quality: [0.7, 0.9],
 				speed: 1
 			})
-		])))
+		]
+		)))
+		.pipe(gulp.dest('./build/img/images/'))
+});
+
+gulp.task('img-compress2', () => {
+	return gulp.src('./src/img/images/**/*.*')
+		.pipe(imageResize({ percentage: 200 }))
+		.pipe(cache(imagemin([
+			imgCompress({
+				loops: 4,
+				min: 65,
+				max: 75,
+				quality: 'high'
+			}),
+			imagemin.gifsicle({ interlaced: true }),
+			imagemin.jpegtran({ progressive: true }),
+			imagemin.optipng({ optimizationLevel: 3 }),
+			imageminPngquant({
+				quality: [0.7, 0.9],
+				speed: 1
+			})
+		]
+		)))
+		.pipe(rename(function (path) { path.basename += "-2x" }))
+		.pipe(gulp.dest('./build/img/images/'))
+		
+});
+
+gulp.task('img-compress', gulp.parallel('img-compress1', 'img-compress2'));
+
+
+gulp.task('webp1', () => {
+	return gulp.src('./src/img/images/**')
+		.pipe(webp())
 		.pipe(gulp.dest('./build/img/images'))
 });
 
-gulp.task('webp', () => {
-    return gulp.src('./src/img/images/**')
-        .pipe(webp())
-        .pipe(gulp.dest('./build/img/images'))
+gulp.task('webp2', () => {
+	return gulp.src('./src/img/images/**{jpg,png}')
+	.pipe(imageResize({ percentage: 200 }))
+		.pipe(webp())
+		.pipe(rename(function (path) { path.basename += "-2x" }))
+		.pipe(gulp.dest('./build/img/images'))
 });
+
+gulp.task('webp', gulp.parallel('webp1', 'webp2'));
+
 
 // Таск для создания SVG-спрайтов
 gulp.task('svg', () => {
@@ -223,7 +265,7 @@ gulp.task('watch', () => {
 		}
 	});
 	// Слежка за добавлением изображений
-	gulp.watch('./src/img/images/**', gulp.series('img-compress', gulp.parallel('webp')))
+	gulp.watch('./src/img/images/**/*', gulp.series('img-compress', gulp.parallel('webp')))
 	// Слежка за добавлением svg
 	gulp.watch('./src/img/svg/*.svg', gulp.series('svg'))
 	//Следить за файлами со стилями с нужным расширением

@@ -31,7 +31,6 @@ const replace = require("gulp-replace");
 const svgSprite = require("gulp-svg-sprite");
 
 
-
 let varStyles = [
 	// './src/libs/owlcarousel/*.css',
 	// './src/libs/slick/*.css',

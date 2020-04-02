@@ -219,7 +219,7 @@ audio:not([controls]) {
     */
 
 img {
-    border-style: none;
+    border-style: none;    
 }
 
 /**
@@ -239,6 +239,7 @@ svg:not(:root) {
 
 button, input, optgroup, select, textarea {
     margin: 0;
+    padding: 0;
     font-family: inherit;
 }
 

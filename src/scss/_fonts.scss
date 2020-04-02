@@ -4,10 +4,9 @@
         font-weight: 400;
         font-style: normal;
         font-display: swap;
-        src:
-            url('#{$file-path}.woff') format('woff'),
-            url('#{$file-path}.woff2') format('woff2'),;
+        src:    url('#{$file-path}.woff2') format('woff2'),
+                url('#{$file-path}.woff') format('woff');
     }
 }
 
-@include font-face('RobotoBold', '../fonts/RobotoBold/RobotoBold');
+// @include font-face('RobotoBold', '../fonts/RobotoBold/RobotoBold');

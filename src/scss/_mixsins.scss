@@ -81,8 +81,8 @@
         display: inline-block;
         width: $w;
         height: $h;
-        background-color: $c;
         vertical-align: middle;
+        background-color: $c;
     }
 
     &:before {
@@ -106,8 +106,8 @@
     width: $widthButton;
     height: $heightButton;
     padding: 0;
-    background: $colorButton;
     border: none;
+    background: $colorButton;
     cursor: pointer;
     outline: none;
 

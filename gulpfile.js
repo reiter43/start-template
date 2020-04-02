@@ -6,6 +6,8 @@ const rename = require("gulp-rename");
 
 const browserSync = require('browser-sync').create();
 
+const fileinclude = require('gulp-file-include');
+
 const concat = require('gulp-concat');
 const autoprefixer = require('gulp-autoprefixer');
 const cleanCSS = require('gulp-clean-css');
@@ -14,13 +16,12 @@ const sass = require('gulp-sass');
 const gcmq = require('gulp-group-css-media-queries');
 const smartgrid = require('smart-grid');
 
-const uglify = require('gulp-uglify');
-const babel = require('gulp-babel');
+const webpackStr = require("webpack-stream");
+const webpack = require('webpack');
 
 const imagemin = require('gulp-imagemin');
 const imgCompress = require('imagemin-jpeg-recompress');
 const imageminPngquant = require('imagemin-pngquant');
-const webp = require('gulp-webp');
 const imageminWebp = require("imagemin-webp");
 const cache = require('gulp-cache');
 const imageResize = require('gulp-image-resize');
@@ -31,32 +32,11 @@ const replace = require("gulp-replace");
 const svgSprite = require("gulp-svg-sprite");
 
 
-let varStyles = [
-	// './src/libs/owlcarousel/*.css',
-	// './src/libs/slick/*.css',
-	// './src/libs/magneficPopap/*.css',
-	'./src/scss/style.scss'
-];
-
-let varScriptsJ = [
-	// './src/libs/jQuery/*.js',
-	// './src/libs/owlcarousel/*.js',
-	// './src/libs/slick/*.js',
-	// './src/libs/pageToScroll/*.js',
-	// './src/libs/lazyLoad/*js',
-	// './src/libs/magneficPopap/*.js',
-	'./src/js/scriptJquery/*.js'
-];
-
-let varScripts = [
-	'./src/js/script/*.js',
-	'./src/js/script/script.js'
-];
 
 let varDel = [
 	'build/css/*',
 	'build/js/*',
-	'build/img/*'
+	'build/*.html',
 ];
 
 let settings = {
@@ -90,15 +70,15 @@ let settings = {
 			width: "750px",
 			fields: "30px"
 		},
-		xs: {
+		s: {
 			width: "576px",
 			fields: "15px"
 		},
-		xxs: {
-			width: "375px",
+		xs: {
+			width: "440px",
 			fields: "15px"
 		},
-		xxxs: {
+		xxs: {
 			width: "320px"
 		}
 	}
@@ -106,9 +86,33 @@ let settings = {
 
 
 
+
+//Таск для очистки папки build
+gulp.task('del', () => {
+	return del(varDel)
+});
+
+//Таск для очистки папки build/img
+gulp.task('img-del', () => {
+	return del('./build/img/**/*')
+});
+
+
+//Таск обработки разметки
+gulp.task('html', () => {
+	return gulp.src('./src/*.html')
+		.pipe(fileinclude({
+			prefix: '@',
+			basepath: '@file'
+		}))
+		.pipe(gulp.dest('./build'))
+		.pipe(browserSync.stream());
+})
+
+
 //Таск для обработки стилей
 gulp.task('styles', () => {
-	return gulp.src(varStyles)
+	return gulp.src('./src/scss/style.scss')
 		.pipe(sourcemaps.init())
 		.pipe(sass())
 		.pipe(concat('style.css'))
@@ -127,93 +131,162 @@ gulp.task('styles', () => {
 });
 
 
-//Таск для обработки скриптов jQUery
-gulp.task('scripts', () => {
-	return gulp.src(varScriptsJ)
-		.pipe(concat('all.js'))
-		.pipe(uglify())
-		.pipe(gulp.dest('./build/js'))
-		.pipe(browserSync.stream());
-});
-
-//Таск для обработки скриптов кастомных
-gulp.task('scriptsCustom', () => {
-	return gulp.src(varScripts)
-		.pipe(babel({
-			presets: ['@babel/env']
+//Таск для обработки скриптов
+gulp.task("scripts", () => {
+	return gulp.src("./src/js/script.js")
+		.pipe(webpackStr({
+			mode: 'development',
+			output: {
+				filename: 'script.js'
+			},
+			watch: false,
+			devtool: "source-map",
+			plugins: [
+				new webpack.ProvidePlugin({
+				  $: 'jquery',
+				  jQuery: 'jquery',
+				  'window.jQuery': 'jquery'
+				}),
+			],
+			module: {
+				rules: [
+					{
+						test: /\.m?js$/,
+						exclude: /(node_modules|bower_components)/,
+						use: {
+							loader: 'babel-loader',
+							options: {
+								presets: [['@babel/preset-env', {
+									debug: true,
+									corejs: 3,
+									useBuiltIns: "usage"
+								}]]
+							}
+						}
+					}
+				]
+			}
 		}))
-		.pipe(concat('scripts.js'))
-		.pipe(uglify())
 		.pipe(gulp.dest('./build/js'))
-		.pipe(browserSync.stream());
+		.on("end", browserSync.reload);
 });
 
-//Таск для очистки папки build
-gulp.task('del', () => {
-	return del(varDel)
+gulp.task("scripts-prod", () => {
+	return gulp.src("./src/js/script.js")
+		.pipe(webpackStr({
+			mode: 'production',
+			output: {
+				filename: 'script.js'
+			},
+			plugins: [
+				new webpack.ProvidePlugin({
+				  $: 'jquery',
+				  jQuery: 'jquery',
+				  'window.jQuery': 'jquery'
+				}),
+			],
+			module: {
+				rules: [
+					{
+						test: /\.m?js$/,
+						exclude: /(node_modules|bower_components)/,
+						use: {
+							loader: 'babel-loader',
+							options: {
+								presets: [['@babel/preset-env', {
+									corejs: 3,
+									useBuiltIns: "usage"
+								}]]
+							}
+						}
+					}
+				]
+			}
+		}))
+		.pipe(gulp.dest('./build/js'))
+		.on("end", browserSync.reload);
 });
+
 
 // Таск для сжатия изображений и конвертации в WebP
 gulp.task('img-compress1', () => {
-	return gulp.src('./src/img/images/**/*.*')		
-		.pipe(cache(imagemin([
-			imgCompress({
-				loops: 4,
-				min: 65,
-				max: 75,
-				quality: 'high'
-			}),
-			imagemin.gifsicle({ interlaced: true }),
-			imagemin.jpegtran({ progressive: true }),
-			imagemin.optipng({ optimizationLevel: 3 }),
-			imageminPngquant({
-				quality: [0.7, 0.9],
-				speed: 1
-			})
-		]
-		)))
+	return gulp.src('./src/img/images/**/*.{jpg,png,svg}')
+		.pipe(cache(
+			imagemin([
+				imgCompress({
+					loops: 4,
+					min: 65,
+					max: 75,
+					quality: 'high'
+				}),
+				imagemin.gifsicle({ interlaced: true }),
+				imagemin.jpegtran({ progressive: true }),
+				imagemin.optipng({ optimizationLevel: 3 }),
+				imageminPngquant({
+					quality: [0.7, 0.9],
+					speed: 1
+				})
+			]
+			)))
 		.pipe(gulp.dest('./build/img/images/'))
 });
 
 gulp.task('img-compress2', () => {
-	return gulp.src('./src/img/images/**/*.*')
+	return gulp.src('./src/img/images/**/*.{jpg,png}')
 		.pipe(imageResize({ percentage: 200 }))
-		.pipe(cache(imagemin([
-			imgCompress({
-				loops: 4,
-				min: 65,
-				max: 75,
-				quality: 'high'
-			}),
-			imagemin.gifsicle({ interlaced: true }),
-			imagemin.jpegtran({ progressive: true }),
-			imagemin.optipng({ optimizationLevel: 3 }),
-			imageminPngquant({
-				quality: [0.7, 0.9],
-				speed: 1
-			})
-		]
-		)))
+		.pipe(cache(
+			imagemin([
+				imgCompress({
+					loops: 4,
+					min: 65,
+					max: 75,
+					quality: 'high'
+				}),
+				imagemin.gifsicle({ interlaced: true }),
+				imagemin.jpegtran({ progressive: true }),
+				imagemin.optipng({ optimizationLevel: 3 }),
+				imageminPngquant({
+					quality: [0.7, 0.9],
+					speed: 1
+				})
+			]
+			)))
 		.pipe(rename(function (path) { path.basename += "-2x" }))
-		.pipe(gulp.dest('./build/img/images/'))
-		
+		.pipe(gulp.dest('./build/img/images/2x'))
+
 });
 
 gulp.task('img-compress', gulp.parallel('img-compress1', 'img-compress2'));
 
 
 gulp.task('webp1', () => {
-	return gulp.src('./src/img/images/**')
-		.pipe(webp())
+	return gulp.src('./src/img/images/**/[^bg-]*.{jpg,png}')
+		.pipe(cache(
+			imagemin({
+				verbose: true,
+				plugins: imageminWebp({ quality: 70 })
+			}))
+		)
+		.pipe(rename(function (path) {
+			path.extname = ".webp";
+		}))
 		.pipe(gulp.dest('./build/img/images'))
 });
 
 gulp.task('webp2', () => {
-	return gulp.src('./src/img/images/**{jpg,png}')
-	.pipe(imageResize({ percentage: 200 }))
-		.pipe(webp())
-		.pipe(rename(function (path) { path.basename += "-2x" }))
-		.pipe(gulp.dest('./build/img/images'))
+	return gulp.src('./src/img/images/**/[^bg-]*.{jpg,png}')
+		.pipe(imageResize({ percentage: 200 }))
+		.pipe(cache(
+			imagemin({
+				verbose: true,
+				plugins: imageminWebp({ quality: 70 })
+			}))
+		)
+		.pipe(rename(function (path) {
+			path.basename += "-2x";
+			path.extname = ".webp";
+		}))
+		.pipe(gulp.dest('./build/img/images/2x'))
 });
 
 gulp.task('webp', gulp.parallel('webp1', 'webp2'));
@@ -270,15 +343,15 @@ gulp.task('watch', () => {
 	//Следить за файлами со стилями с нужным расширением
 	gulp.watch('./src/scss/**/*.scss', gulp.series('styles'))
 	//Следить за JS файлами
-	gulp.watch('./src/js/**/*.js', gulp.series('scripts', gulp.parallel('scriptsCustom')))
+	gulp.watch('./src/js/**/*.js', gulp.series('scripts'))
 	// gulp.watch('./src/js/script/*.js', gulp.series('scriptsCustom', ))
 	//При изменении HTML запустить синхронизацию
-	gulp.watch("./build/*.html").on('change', browserSync.reload);
+	gulp.watch('./src/**/*.html', gulp.series('html'));
 });
 
 
 
 //Таск по умолчанию. Запускает сборку
-gulp.task('default', gulp.series('del', gulp.parallel('styles', 'scripts', 'scriptsCustom', 'img-compress', 'webp', 'svg'), 'watch'));
-
-
+gulp.task('default', gulp.series('del', 'html', gulp.parallel('styles','scripts', 'img-compress', 'webp', 'svg'), 'watch'));
+//Таск продакшэн. Запускает сборку
+gulp.task('prod', gulp.series('del', 'html', gulp.parallel('styles','scripts-prod', 'img-compress', 'webp', 'svg'), 'watch'));

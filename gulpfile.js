@@ -33,12 +33,6 @@ const svgSprite = require("gulp-svg-sprite");
 
 
 
-let varDel = [
-	'build/css/*',
-	'build/js/*',
-	'build/*.html',
-];
-
 let settings = {
 	filename: "smart-grid",
 	outputStyle: "scss",
@@ -89,7 +83,7 @@ let settings = {
 
 //Таск для очистки папки build
 gulp.task('del', () => {
-	return del(varDel)
+	return del(['build/**/*', '!build/fonts/**'])
 });
 
 //Таск для очистки папки build/img

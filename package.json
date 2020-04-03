@@ -86,7 +86,6 @@
         }
     },
     "lint-staged": {
-       
         "./src/js/modules/*": [
             "npm run js:fix",
             "git add"

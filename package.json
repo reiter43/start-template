@@ -18,7 +18,6 @@
         "eslint": "^6.8.0",
         "eslint-config-airbnb-base": "^14.1.0",
         "eslint-plugin-import": "^2.20.2",
-        "husky": "^4.2.3",
         "gulp": "^4.0.0",
         "gulp-autoprefixer": "^6.0.0",
         "gulp-babel": "^8.0.0",
@@ -41,7 +40,6 @@
         "imagemin-jpeg-recompress": "^6.0.0",
         "imagemin-pngquant": "^8.0.0",
         "imagemin-webp": "^5.1.0",
-        "lint-staged": "^10.1.1",
         "smart-grid": "^2.1.2",
         "stylelint": "^13.2.1",
         "stylelint-order": "^4.0.0",
@@ -49,11 +47,10 @@
         "webpack-stream": "^5.2.1"
     },
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "style:lint": "stylelint \"./src/scss/*.scss\" --syntax=scss",
+        "style:lint": "stylelint \"./src/scss/*.scss\"",
         "js:lint": "eslint ./src/js/modules/*",
-        "style:fix": "stylelint \"src/scss/**/*.scss\" --fix --color",
-        "js:fix": "eslint ./src/js/modules/* --fix --color"
+        "style:fix": "stylelint \"src/scss/**/*.scss\" --fix",
+        "js:fix": "eslint ./src/js/modules/* --fix"
     },
     "dependencies": {
         "jquery": "^3.4.1",
@@ -79,17 +76,6 @@
                 }
             ]
         }
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
-    "lint-staged": {
-        "./src/js/modules/*": [
-            "npm run js:fix",
-            "git add"
-        ]
     },
     "keywords": [],
     "author": "Reiter",

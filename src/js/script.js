@@ -4,6 +4,8 @@
 import 'lazysizes';
 
 import test from './modules/test';
+import tab from './modules/tabs';
+import modalWindow from './modules/modal';
 
 
 window.addEventListener('DOMContentLoaded', () => {

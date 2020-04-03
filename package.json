@@ -74,7 +74,9 @@
                 {
                     "code": 150
                 }
-            ]
+            ],
+            "no-shadow": "off",
+            "no-param-reassign": "off"
         }
     },
     "keywords": [],

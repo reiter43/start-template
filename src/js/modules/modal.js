@@ -1,4 +1,4 @@
-function modalWindow(btnsOpen, windowModal) {
+const modalWindow = (btnsOpen, windowModal) => {
     const btnsOpenWindow = document.querySelectorAll(btnsOpen);
     const modal = document.querySelector(windowModal);
     const modalDialog = modal.firstElementChild;
@@ -53,6 +53,6 @@ function modalWindow(btnsOpen, windowModal) {
 
         return scrollWidth;
     }
-}
+};
 
 export default modalWindow;

@@ -1,4 +1,4 @@
-function dropDown(selector) {
+const dropDown = (selector) => {
     const dropdownBtn = document.querySelector(selector);
     const dropdownList = dropdownBtn.nextElementSibling;
     const dropItems = dropdownList.querySelectorAll('[role="menuitem"]');
@@ -30,9 +30,9 @@ function dropDown(selector) {
             });
         });
     });
-}
+};
 
-function dropDownAct(selector) {
+const dropDownAct = (selector) => {
     const dropdownBtn = document.querySelector(selector);
     const dropdownList = dropdownBtn.nextElementSibling;
     const dropOptions = dropdownList.querySelectorAll('[role="option"]');
@@ -69,6 +69,6 @@ function dropDownAct(selector) {
             });
         });
     });
-}
+};
 
 export { dropDown, dropDownAct };

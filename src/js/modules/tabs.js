@@ -1,4 +1,4 @@
-function tab(itemsSelector, contentstSelector) {
+const tab = (itemsSelector, contentstSelector) => {
     const tabs = document.querySelectorAll(itemsSelector);
     const panels = document.querySelectorAll(contentstSelector);
     const tabList = tabs[0].parentNode;
@@ -49,6 +49,6 @@ function tab(itemsSelector, contentstSelector) {
             });
         }
     }
-}
+};
 
 export default tab;
